@@ -5,26 +5,36 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 
 import mykmmapp.shared.generated.resources.Res
 import mykmmapp.shared.generated.resources.compose_multiplatform
@@ -68,7 +78,6 @@ fun App() {
                                     println("here")
                                 },
                             )
-                        ,
                     )
 
                     Text(
@@ -78,8 +87,73 @@ fun App() {
                             .padding(horizontal = 16.dp),
                         fontSize = 24.sp
                     )
+
+                    MainCheckBox()
+
+                    Spacer(Modifier.height(30.dp))
+
+                    CheckEmailField()
                 }
             }
         }
     }
+}
+
+@Composable
+fun MainCheckBox() {
+//    val isChecked: MutableState<Boolean> = remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(false) }
+
+    Checkbox(
+        checked = isChecked,
+        onCheckedChange = {
+            isChecked = it
+        },
+        modifier = Modifier
+            .scale(scale = 4f)
+            .padding(20.dp)
+    )
+}
+
+@Composable
+fun CheckEmailField() {
+    var textState by remember { mutableStateOf("") }
+    var errorState by remember { mutableStateOf("") }
+
+    OutlinedTextField(
+        value = textState,
+        onValueChange = {
+            textState = it
+            errorState = if (it.isValidEmail()) "" else "uncorrect email"
+        },
+        shape = RoundedCornerShape(10.dp),
+        placeholder = {
+            Text("example@mail.com")
+        },
+        singleLine = true,
+        label = {
+            Text(
+                text = if (errorState.isEmpty()) "Email" else errorState
+            )
+        },
+        trailingIcon = {
+            IconButton(
+                onClick = {
+                    textState = ""
+                    errorState = ""
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Clear,
+                    contentDescription = "",
+                )
+            }
+        },
+        isError = errorState.isNotEmpty(),
+    )
+}
+
+fun String.isValidEmail(): Boolean {
+    val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+    return emailRegex.matches(this)
 }
