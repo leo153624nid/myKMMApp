@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.ui.draw.alpha
 
 import mykmmapp.shared.generated.resources.Res
 import mykmmapp.shared.generated.resources.compose_multiplatform
@@ -42,6 +43,11 @@ import mykmmapp.shared.generated.resources.compose_multiplatform
 @Composable
 @Preview
 fun App() {
+    var userEmail by remember { mutableStateOf("") }
+    var isEmailFormatValid by remember { mutableStateOf(true) }
+    var validationMessage by remember { mutableStateOf("") }
+    val testMail = "abc@abc.com"
+
     MaterialTheme {
         var showContent by remember { mutableStateOf(true) }
 
@@ -54,9 +60,14 @@ fun App() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = { showContent = !showContent }) {
+            Button(onClick = {
+//                showContent = !showContent
+//                val intent = Intent()
+            }) {
                 Text("Click me!")
             }
+
+            ListScreen()
 
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
@@ -70,7 +81,7 @@ fun App() {
                         painter = painterResource(Res.drawable.compose_multiplatform),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(200.dp)
+                            .size(100.dp)
                             .shadow(5.dp, CircleShape)
                             .clip(CircleShape)
                             .clickable(
@@ -92,7 +103,38 @@ fun App() {
 
                     Spacer(Modifier.height(30.dp))
 
-                    CheckEmailField()
+                    CheckEmailField(
+                        email = userEmail,
+                        isEmailValid = isEmailFormatValid,
+                        onEmailChanged = {
+                            userEmail = it
+                            isEmailFormatValid = it.isValidEmail()
+                            validationMessage = if (!isEmailFormatValid) "Uncorrected email" else ""
+                        },
+                        onClearClicked = {
+                            userEmail = ""
+                            isEmailFormatValid = true
+                            validationMessage = ""
+                        },
+                    )
+
+                    Text(
+                        validationMessage,
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .alpha(if (validationMessage.isNotEmpty() && isEmailFormatValid) 1f else 0f)
+                        ,
+                    )
+
+                    PrimaryButton("Login") {
+                        validationMessage = if (userEmail.isEmpty() || !isEmailFormatValid) {
+                            "Uncorrected email"
+                        } else if (userEmail == testMail) {
+                            "Already exists"
+                        } else {
+                            "Well done"
+                        }
+                    }
                 }
             }
         }
@@ -110,21 +152,22 @@ fun MainCheckBox() {
             isChecked = it
         },
         modifier = Modifier
-            .scale(scale = 4f)
+            .scale(scale = 2f)
             .padding(20.dp)
     )
 }
 
 @Composable
-fun CheckEmailField() {
-    var textState by remember { mutableStateOf("") }
-    var errorState by remember { mutableStateOf("") }
-
+fun CheckEmailField(
+    email: String,
+    isEmailValid: Boolean,
+    onEmailChanged: (String) -> Unit,
+    onClearClicked: () -> Unit,
+) {
     OutlinedTextField(
-        value = textState,
+        value = email,
         onValueChange = {
-            textState = it
-            errorState = if (it.isValidEmail()) "" else "uncorrect email"
+            onEmailChanged(it)
         },
         shape = RoundedCornerShape(10.dp),
         placeholder = {
@@ -133,14 +176,13 @@ fun CheckEmailField() {
         singleLine = true,
         label = {
             Text(
-                text = if (errorState.isEmpty()) "Email" else errorState
+                text = if (isEmailValid) "Email" else "uncorrected email"
             )
         },
         trailingIcon = {
             IconButton(
                 onClick = {
-                    textState = ""
-                    errorState = ""
+                    onClearClicked()
                 },
             ) {
                 Icon(
@@ -149,11 +191,30 @@ fun CheckEmailField() {
                 )
             }
         },
-        isError = errorState.isNotEmpty(),
+        isError = !isEmailValid && email.isNotEmpty(),
     )
 }
 
 fun String.isValidEmail(): Boolean {
     val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
     return emailRegex.matches(this)
+}
+
+@Composable
+fun PrimaryButton(
+    text: String,
+    onClick: (String) -> Unit,
+) {
+    Button(
+        shape = RoundedCornerShape(10.dp),
+        onClick = { onClick(text) },
+        modifier = Modifier
+            .height(56.dp)
+            .padding(40.dp, 0.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text,
+        )
+    }
 }
