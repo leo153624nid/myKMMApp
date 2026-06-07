@@ -22,16 +22,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.mykmmapp.navigation.AppNavigator
 
 @Composable
-fun ListScreen() {
+fun ListScreen(
+    navigator: AppNavigator, // TODO: inject to viewModel
+    id: String? = null,
+) {
+    val id =  id ?: ""
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    Text(id)
+                },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = {
+                        navigator.back()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardReturn,
                             contentDescription = ""

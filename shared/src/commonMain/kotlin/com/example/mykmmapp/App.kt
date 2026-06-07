@@ -36,13 +36,15 @@ import org.jetbrains.compose.resources.painterResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.ui.draw.alpha
+import com.example.mykmmapp.navigation.AppNavigator
 
 import mykmmapp.shared.generated.resources.Res
 import mykmmapp.shared.generated.resources.compose_multiplatform
 
 @Composable
-@Preview
-fun App() {
+fun App(
+    navigator: AppNavigator, // TODO: inject to viewModel
+) {
     var userEmail by remember { mutableStateOf("") }
     var isEmailFormatValid by remember { mutableStateOf(true) }
     var validationMessage by remember { mutableStateOf("") }
@@ -62,12 +64,10 @@ fun App() {
         ) {
             Button(onClick = {
 //                showContent = !showContent
-//                val intent = Intent()
+                navigator.toSecond()
             }) {
                 Text("Click me!")
             }
-
-            ListScreen()
 
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
