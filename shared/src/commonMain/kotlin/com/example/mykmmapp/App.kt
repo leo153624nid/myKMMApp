@@ -48,6 +48,7 @@ fun App(
     var userEmail by remember { mutableStateOf("") }
     var isEmailFormatValid by remember { mutableStateOf(true) }
     var validationMessage by remember { mutableStateOf("") }
+    val greeting = remember { Greeting().greet() }
     val testMail = "abc@abc.com"
 
     MaterialTheme {
@@ -70,8 +71,6 @@ fun App(
             }
 
             AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
