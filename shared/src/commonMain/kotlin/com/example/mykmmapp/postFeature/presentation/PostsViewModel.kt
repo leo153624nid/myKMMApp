@@ -27,12 +27,12 @@ class PostsViewModel(
     fun handleIntent(intent: PostsIntent) {
         when (intent) {
             is PostsIntent.LoadPosts -> loadPosts()
-            is PostsIntent.Refresh -> loadPosts(isRefresh = true)
+            is PostsIntent.Refresh -> loadPosts()
             is PostsIntent.PostClicked -> navigateToDetail(intent.post.id)
         }
     }
 
-    private fun loadPosts(isRefresh: Boolean = false) {
+    private fun loadPosts() {
         if (_state.value.isLoading) return
 
         viewModelScope.launch {

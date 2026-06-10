@@ -55,25 +55,3 @@ fun AppNavHost(
         }
     }
 }
-
-class AppNavigator { // TODO: interface
-
-    private val _events = MutableSharedFlow<Destination>(extraBufferCapacity = 1)
-    val events = _events.asSharedFlow()
-
-    fun toMain() {
-        _events.tryEmit(Destination.MainScreen)
-    }
-
-    fun toPosts() {
-        _events.tryEmit(Destination.PostsScreen)
-    }
-
-    fun toPostDetail(postId: Int) {
-        _events.tryEmit(Destination.PostDetailScreen(postId))
-    }
-
-    fun back() {
-        _events.tryEmit(Destination.Back)
-    }
-}
