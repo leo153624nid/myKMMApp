@@ -26,7 +26,7 @@ import com.example.mykmmapp.navigation.AppNavigator
 
 @Composable
 fun ListScreen(
-    navigator: AppNavigator, // TODO: inject to viewModel
+    navigator: AppNavigator,
     id: String? = null,
 ) {
     val id =  id ?: ""

@@ -16,14 +16,14 @@ import kotlinx.serialization.Serializable
 sealed interface Destination {
 
     @Serializable
-    data object FirstScreen : Destination
+    data object MainScreen: Destination
 
     @Serializable
-    data object SecondScreen : Destination
+    data object PostsScreen: Destination
 
     @Serializable
-    data class DetailScreen(val id: String) : Destination
+    data class PostDetailScreen(val postId: Int): Destination
 
     @Serializable
-    data object Back : Destination
+    data object Back: Destination
 }

@@ -6,9 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.mykmmapp.App
-import com.example.mykmmapp.ListContent
+import com.example.mykmmapp.ui.App
 import com.example.mykmmapp.ListScreen
+import com.example.mykmmapp.postFeature.presentation.PostDetailScreen
+import com.example.mykmmapp.postFeature.presentation.PostsScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
@@ -21,9 +22,9 @@ fun AppNavHost(
     LaunchedEffect(Unit) {
         navigator.events.collect { event ->
             when (event) {
-                Destination.FirstScreen -> navHostController.navigate(Destination.FirstScreen)
-                Destination.SecondScreen -> navHostController.navigate(Destination.SecondScreen)
-                is Destination.DetailScreen -> navHostController.navigate(Destination.DetailScreen(event.id))
+                Destination.MainScreen -> navHostController.navigate(Destination.MainScreen)
+                Destination.PostsScreen -> navHostController.navigate(Destination.PostsScreen)
+                is Destination.PostDetailScreen -> navHostController.navigate(Destination.PostDetailScreen(event.postId))
                 Destination.Back -> navHostController.popBackStack()
             }
         }
@@ -31,25 +32,25 @@ fun AppNavHost(
 
     NavHost(
         navController = navHostController,
-        startDestination = Destination.FirstScreen
+        startDestination = Destination.MainScreen
     ) {
-        composable<Destination.FirstScreen> {
+        composable<Destination.MainScreen> {
             App(
                 navigator = navigator
             )
         }
 
-        composable<Destination.SecondScreen> {
-            ListScreen(
-                navigator = navigator
+        composable<Destination.PostsScreen> {
+            PostsScreen(
+                navigator = navigator,
             )
         }
 
-        composable<Destination.DetailScreen> {
-            val dest: Destination.DetailScreen = it.toRoute()
-            ListScreen(
+        composable<Destination.PostDetailScreen> {
+            val dest: Destination.PostDetailScreen = it.toRoute()
+            PostDetailScreen(
                 navigator = navigator,
-                id = dest.id
+                postId = dest.postId,
             )
         }
     }
@@ -60,12 +61,16 @@ class AppNavigator { // TODO: interface
     private val _events = MutableSharedFlow<Destination>(extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
 
-    fun toSecond() {
-        _events.tryEmit(Destination.SecondScreen)
+    fun toMain() {
+        _events.tryEmit(Destination.MainScreen)
     }
 
-    fun toDetail(id: String) {
-        _events.tryEmit(Destination.DetailScreen(id))
+    fun toPosts() {
+        _events.tryEmit(Destination.PostsScreen)
+    }
+
+    fun toPostDetail(postId: Int) {
+        _events.tryEmit(Destination.PostDetailScreen(postId))
     }
 
     fun back() {

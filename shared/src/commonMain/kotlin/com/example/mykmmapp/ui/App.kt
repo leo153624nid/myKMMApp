@@ -1,4 +1,4 @@
-package com.example.mykmmapp
+package com.example.mykmmapp.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -29,13 +29,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.ui.draw.alpha
+import com.example.mykmmapp.data.model.Greeting
 import com.example.mykmmapp.navigation.AppNavigator
 
 import mykmmapp.shared.generated.resources.Res
@@ -43,7 +43,7 @@ import mykmmapp.shared.generated.resources.compose_multiplatform
 
 @Composable
 fun App(
-    navigator: AppNavigator, // TODO: inject to viewModel
+    navigator: AppNavigator,
 ) {
     var userEmail by remember { mutableStateOf("") }
     var isEmailFormatValid by remember { mutableStateOf(true) }
@@ -65,7 +65,7 @@ fun App(
         ) {
             Button(onClick = {
 //                showContent = !showContent
-                navigator.toSecond()
+                navigator.toPosts()
             }) {
                 Text("Click me!")
             }

@@ -1,0 +1,28 @@
+package com.example.mykmmapp.di
+
+import com.example.mykmmapp.postFeature.data.network.PostApi
+import com.example.mykmmapp.postFeature.data.network.createHttpClient
+import com.example.mykmmapp.postFeature.data.repository.PostRepository
+import com.example.mykmmapp.postFeature.data.repository.PostRepositoryImpl
+import com.example.mykmmapp.postFeature.presentation.PostsViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
+
+val networkModule = module {
+    single { createHttpClient() }
+    single { PostApi(get()) }
+}
+
+val repositoryModule = module {
+    single<PostRepository> { PostRepositoryImpl(get()) }
+}
+
+val viewModelModule = module {
+    viewModel { PostsViewModel(get()) }
+}
+
+val postsModules = listOf(
+    networkModule,
+    repositoryModule,
+    viewModelModule,
+)
