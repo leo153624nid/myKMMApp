@@ -2,6 +2,7 @@ package com.example.mykmmapp.postFeature.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mykmmapp.postFeature.data.network.PostApi
 import com.example.mykmmapp.postFeature.data.repository.PostRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,32 +22,39 @@ class PostsViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
-        handleIntent(PostsIntent.LoadPosts)
+        handleIntent(PostsIntent.Refresh)
     }
 
     fun handleIntent(intent: PostsIntent) {
         when (intent) {
-            is PostsIntent.LoadPosts -> loadPosts()
-            is PostsIntent.Refresh -> loadPosts()
+            is PostsIntent.Refresh -> refreshPosts()
+            is PostsIntent.LoadNextPage -> loadNextPage()
             is PostsIntent.PostClicked -> navigateToDetail(intent.post.id)
         }
     }
 
-    private fun loadPosts() {
+    private fun refreshPosts() {
         if (_state.value.isLoading) return
 
         viewModelScope.launch {
             _state.update {
-                it.copy(isLoading = true, error = null)
+                it.copy(
+                    isLoading = true,
+                    error = null,
+                    posts = emptyList(),
+                    currentPage = 1,
+                    canLoadMore = true,
+                )
             }
 
-            repository.getPosts()
+            repository.getPosts(page = 1)
                 .onSuccess { posts ->
                     _state.update {
                         it.copy(
                             isLoading = false,
                             error = null,
-                            posts = posts
+                            posts = posts,
+                            canLoadMore = posts.size >= PostApi.PAGE_SIZE // TODO: value from Util
                         )
                     }
                 }
@@ -55,6 +63,44 @@ class PostsViewModel(
                     _state.update {
                         it.copy(
                             isLoading = false,
+                            error = message,
+                        )
+                    }
+                    _effect.send(PostsEffect.ShowError(message))
+                }
+        }
+    }
+
+    fun loadNextPage() {
+        val current = _state.value
+
+        if (current.isLoading) return
+        if (current.isLoadingMore) return
+        if (!current.canLoadMore) return
+
+        val nextPage = current.currentPage + 1
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isLoadingMore = true)
+            }
+
+            repository.getPosts(page = nextPage)
+                .onSuccess { newPosts ->
+                    _state.update {
+                        it.copy(
+                            isLoadingMore = false,
+                            posts = it.posts + newPosts,
+                            currentPage = nextPage,
+                            canLoadMore = newPosts.size >= PostApi.PAGE_SIZE,
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    val message = error.message ?: "Unknown error"
+                    _state.update {
+                        it.copy(
+                            isLoadingMore = false,
                             error = message,
                         )
                     }

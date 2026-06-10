@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -31,6 +33,10 @@ import com.example.mykmmapp.postFeature.data.model.Post
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import org.koin.compose.koinInject
 
 @Composable
@@ -44,7 +50,7 @@ fun PostsScreen(
         vm.effect.collect { effect ->
             when (effect) {
                 is PostsEffect.NavigateToDetail -> { navigator.toPostDetail(effect.postId) }
-                is PostsEffect.ShowError -> {  } // TODO
+                is PostsEffect.ShowError -> {  } // TODO show snackbar ?
             }
         }
     }
@@ -83,6 +89,21 @@ fun PostsContent(
     state: PostsUiState,
     onIntent: (PostsIntent) -> Unit
 ) {
+    val listState = rememberLazyListState()
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisible != null && lastVisible.index >= totalItems - 3
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            onIntent(PostsIntent.LoadNextPage)
+        }
+    }
+
     Box(
        modifier = Modifier.fillMaxSize(),
     ) {
@@ -92,20 +113,37 @@ fun PostsContent(
                 LoadingView()
             }
 
-            // Error
-            state.error != null -> {
+            // Error of first Load
+            state.error != null && state.posts.isEmpty() -> {
                 ErrorView(
                     message = state.error,
                     onClick = { onIntent(PostsIntent.Refresh) },
                 )
             }
 
-            // List
             else -> {
+                // List
                 PostList(
-                    posts = state.posts,
+                    dataState = state,
+                    listState = listState,
                     onClick = onIntent,
                 )
+
+                // Error next page loading
+                if (state.error != null && state.posts.isNotEmpty()) { // TODO: check this
+                    Snackbar(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp),
+                        action = {
+                            TextButton(onClick = { onIntent(PostsIntent.LoadNextPage) }) {
+                                Text("Retry")
+                            }
+                        }
+                    ) {
+                        Text(state.error)
+                    }
+                }
             }
         }
     }
@@ -149,21 +187,55 @@ fun ErrorView(
 
 @Composable
 fun PostList(
-    posts: List<Post>,
+    dataState: PostsUiState,
+    listState: LazyListState,
     onClick: (PostsIntent) -> Unit,
 ) {
     LazyColumn(
+        state = listState,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(
-            items = posts,
+            items = dataState.posts,
             key = { it.id },
         ) { post ->
             PostCell(
                 post = post,
                 onClick = { onClick(PostsIntent.PostClicked(post)) },
             )
+        }
+
+        item {
+            when {
+                dataState.isLoadingMore -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                        ,
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(strokeWidth = 2.dp)
+                    }
+                }
+
+                !dataState.canLoadMore -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                        ,
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Все посты загружены",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
     }
 }
