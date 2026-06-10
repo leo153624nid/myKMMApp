@@ -1,6 +1,5 @@
-package com.example.mykmmapp.postFeature.data.network
+package com.example.mykmmapp.data.network
 
-import com.example.mykmmapp.Platform
 import com.example.mykmmapp.getPlatform
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

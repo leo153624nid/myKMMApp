@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.mykmmapp.ui.App
-import com.example.mykmmapp.ListScreen
 import com.example.mykmmapp.postFeature.presentation.PostDetailScreen
 import com.example.mykmmapp.postFeature.presentation.PostsScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -48,6 +47,7 @@ fun AppNavHost(
 
         composable<Destination.PostDetailScreen> {
             val dest: Destination.PostDetailScreen = it.toRoute()
+
             PostDetailScreen(
                 navigator = navigator,
                 postId = dest.postId,

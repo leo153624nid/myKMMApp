@@ -1,7 +1,7 @@
 package com.example.mykmmapp.di
 
 import com.example.mykmmapp.postFeature.data.network.PostApi
-import com.example.mykmmapp.postFeature.data.network.createHttpClient
+import com.example.mykmmapp.data.network.createHttpClient
 import com.example.mykmmapp.postFeature.data.repository.PostRepository
 import com.example.mykmmapp.postFeature.data.repository.PostRepositoryImpl
 import com.example.mykmmapp.postFeature.presentation.PostsViewModel
@@ -21,7 +21,7 @@ val viewModelModule = module {
     viewModel { PostsViewModel(get()) }
 }
 
-val postsModules = listOf(
+val appModules = listOf(
     networkModule,
     repositoryModule,
     viewModelModule,

@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mykmmapp.navigation.AppNavHost
 import com.example.mykmmapp.navigation.AppNavigator
 
-class MainActivity : ComponentActivity() {
+class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
