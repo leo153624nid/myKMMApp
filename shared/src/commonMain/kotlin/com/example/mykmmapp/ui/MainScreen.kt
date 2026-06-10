@@ -40,10 +40,11 @@ import com.example.mykmmapp.navigation.AppNavigator
 
 import mykmmapp.shared.generated.resources.Res
 import mykmmapp.shared.generated.resources.compose_multiplatform
+import org.koin.compose.koinInject
 
 @Composable
-fun App(
-    navigator: AppNavigator,
+fun MainScreen(
+    navigator: AppNavigator = koinInject(),
 ) {
     var userEmail by remember { mutableStateOf("") }
     var isEmailFormatValid by remember { mutableStateOf(true) }

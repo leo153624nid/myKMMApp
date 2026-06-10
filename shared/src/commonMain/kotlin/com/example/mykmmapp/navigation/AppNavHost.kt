@@ -6,16 +6,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.mykmmapp.ui.App
 import com.example.mykmmapp.postFeature.presentation.PostDetailScreen
 import com.example.mykmmapp.postFeature.presentation.PostsScreen
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import com.example.mykmmapp.ui.MainScreen
+import org.koin.compose.koinInject
 
 @Composable
 fun AppNavHost(
     navHostController: NavHostController,
-    navigator: AppNavigator
+    navigator: AppNavigator = koinInject(),
 ) {
     // подписываемся на события навигации
     LaunchedEffect(Unit) {
@@ -34,22 +33,17 @@ fun AppNavHost(
         startDestination = Destination.MainScreen
     ) {
         composable<Destination.MainScreen> {
-            App(
-                navigator = navigator
-            )
+            MainScreen()
         }
 
         composable<Destination.PostsScreen> {
-            PostsScreen(
-                navigator = navigator,
-            )
+            PostsScreen()
         }
 
         composable<Destination.PostDetailScreen> {
             val dest: Destination.PostDetailScreen = it.toRoute()
 
             PostDetailScreen(
-                navigator = navigator,
                 postId = dest.postId,
             )
         }

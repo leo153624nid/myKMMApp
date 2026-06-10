@@ -29,7 +29,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 
 @Composable
 fun PostDetailScreen(
-    navigator: AppNavigator,
+    navigator: AppNavigator = koinInject(),
     postId: Int,
     repository: PostRepository = koinInject() // простой inject без ViewModel
 ) {

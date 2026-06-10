@@ -31,11 +31,12 @@ import com.example.mykmmapp.postFeature.data.model.Post
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
+import org.koin.compose.koinInject
 
 @Composable
 fun PostsScreen(
     vm: PostsViewModel = koinViewModel(),
-    navigator: AppNavigator,
+    navigator: AppNavigator = koinInject(),
 ) {
     val state by vm.state.collectAsState()
 

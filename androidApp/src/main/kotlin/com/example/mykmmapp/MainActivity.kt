@@ -7,8 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.example.mykmmapp.navigation.AppNavHost
-import com.example.mykmmapp.navigation.AppNavigator
-import com.example.mykmmapp.navigation.RootNavigator
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,11 +15,9 @@ class MainActivity: ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            val navigator: AppNavigator = remember { RootNavigator() }
 
             AppNavHost(
                 navHostController = navController,
-                navigator = navigator
             )
         }
     }
