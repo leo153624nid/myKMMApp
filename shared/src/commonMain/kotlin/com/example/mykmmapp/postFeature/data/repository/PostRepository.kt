@@ -4,6 +4,7 @@ import com.example.mykmmapp.postFeature.data.model.Post
 import com.example.mykmmapp.postFeature.data.network.PostApi
 
 interface PostRepository {
+    val pageSize: Int
     suspend fun getPosts(page: Int): Result<List<Post>>
     suspend fun getPost(id: Int): Result<Post>
 }
@@ -11,6 +12,8 @@ interface PostRepository {
 class PostRepositoryImpl(
     private val api: PostApi
 ): PostRepository {
+
+    override val pageSize: Int = api.PAGE_SIZE
 
     override suspend fun getPosts(page: Int): Result<List<Post>> {
         return runCatching { api.getPosts(page) }

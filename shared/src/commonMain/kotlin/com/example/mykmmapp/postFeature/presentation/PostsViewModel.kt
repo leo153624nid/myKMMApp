@@ -54,7 +54,7 @@ class PostsViewModel(
                             isLoading = false,
                             error = null,
                             posts = posts,
-                            canLoadMore = posts.size >= PostApi.PAGE_SIZE // TODO: value from Util
+                            canLoadMore = posts.size >= repository.pageSize
                         )
                     }
                 }
@@ -92,7 +92,7 @@ class PostsViewModel(
                             isLoadingMore = false,
                             posts = it.posts + newPosts,
                             currentPage = nextPage,
-                            canLoadMore = newPosts.size >= PostApi.PAGE_SIZE,
+                            canLoadMore = newPosts.size >= repository.pageSize,
                         )
                     }
                 }

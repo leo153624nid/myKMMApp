@@ -9,10 +9,8 @@ import io.ktor.client.request.parameter
 class PostApi(
     private val client: HttpClient
 ) {
-    companion object {
-        const val PAGE_SIZE = 15
-        private const val baseURL = "https://jsonplaceholder.typicode.com"
-    }
+    private val baseURL = "https://jsonplaceholder.typicode.com"
+    val PAGE_SIZE = 15
 
     suspend fun getPosts(page: Int, limit: Int = PAGE_SIZE): List<Post> =
         client.get("$baseURL/posts") {
