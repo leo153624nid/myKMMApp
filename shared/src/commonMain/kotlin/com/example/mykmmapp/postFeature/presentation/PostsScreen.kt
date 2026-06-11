@@ -34,6 +34,10 @@ import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
@@ -45,17 +49,29 @@ fun PostsScreen(
     navigator: AppNavigator = koinInject(),
 ) {
     val state by vm.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         vm.effect.collect { effect ->
             when (effect) {
                 is PostsEffect.NavigateToDetail -> { navigator.toPostDetail(effect.postId) }
-                is PostsEffect.ShowError -> {  } // TODO show snackbar ?
+                is PostsEffect.ShowError -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        actionLabel = "Retry",
+                        duration = SnackbarDuration.Long,
+                    )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> vm.handleIntent(PostsIntent.LoadNextPage)
+                        SnackbarResult.Dismissed -> {  } // nothing to do
+                    }
+                }
             }
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Posts") },
