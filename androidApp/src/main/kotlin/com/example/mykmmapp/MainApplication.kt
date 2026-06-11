@@ -6,6 +6,6 @@ import com.example.mykmmapp.di.initKoin
 class MainApplication: Application() {
     override fun onCreate() {
         super.onCreate()
-        initKoin()
+        initKoin(isDebug = BuildConfig.DEBUG)
     }
 }

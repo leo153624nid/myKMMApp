@@ -15,7 +15,7 @@ val navigatorModule = module {
 }
 
 val networkModule = module {
-    single { createHttpClient() }
+    single { createHttpClient(get()) }
     single { PostApi(get()) }
 }
 

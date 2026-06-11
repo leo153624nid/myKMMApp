@@ -5,7 +5,11 @@ import Shared
 struct iOSApp: App {
 
     init() {
-        KoinInitializerKt.doInitKoin()
+        #if DEBUG
+            KoinInitializerKt.doInitKoin(isDebug: true)
+        #else
+            KoinInitializerKt.doInitKoin(isDebug: false)
+        #endif
     }
 
     var body: some Scene {
