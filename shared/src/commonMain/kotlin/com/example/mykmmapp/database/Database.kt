@@ -10,13 +10,13 @@ class Database(driverFactory: DatabaseDriverFactory) {
     private val database = AppDatabase(driverFactory.createDriver())
     private val queries = database.postQueries
 
-    fun selectAllPosts(): Flow<List<Post>> {
+    fun selectAllPosts(): Flow<List<PostEntity>> {
         return queries.selectAll()
             .asFlow()
             .mapToList(Dispatchers.Default)
     }
 
-    fun insertPost(post: Post) {
+    fun insertPost(post: PostEntity) {
         queries.insert(
             id = post.id.toLong(),
             userId = post.userId.toLong(),
