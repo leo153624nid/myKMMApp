@@ -1,0 +1,30 @@
+CREATE TABLE Post (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL
+);
+
+-- получить всех
+selectAll:
+SELECT * FROM Post;
+
+-- получить по id
+selectById:
+SELECT * FROM Post WHERE id = ?;
+
+-- получить посты конкретного пользователя
+selectByUserId:
+SELECT * FROM Post WHERE userId = ?;
+
+-- вставить
+insert:
+INSERT OR REPLACE INTO Post(id, userId, title, body) VALUES (?, ?, ?, ?);
+
+-- удалить по id
+deleteById:
+DELETE FROM Post WHERE id = ?;
+
+-- удалить все
+deleteAll:
+DELETE FROM Post;
