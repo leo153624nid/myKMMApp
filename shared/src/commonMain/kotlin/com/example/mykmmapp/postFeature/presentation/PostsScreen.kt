@@ -146,7 +146,7 @@ fun PostsContent(
                 )
 
                 // Error next page loading
-                if (state.error != null && state.posts.isNotEmpty()) { // TODO: check this
+                if (state.error != null && state.posts.isNotEmpty()) {
                     Snackbar(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)

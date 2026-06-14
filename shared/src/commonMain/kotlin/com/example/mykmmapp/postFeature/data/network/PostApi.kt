@@ -12,10 +12,10 @@ class PostApi(
     private val baseURL = "https://jsonplaceholder.typicode.com"
     val PAGE_SIZE = 15
 
-    suspend fun getPosts(page: Int, limit: Int = PAGE_SIZE): List<Post> =
+    suspend fun getPosts(page: Int): List<Post> =
         client.get("$baseURL/posts") {
-            parameter("_start", (page - 1) * limit)
-            parameter("_limit", limit)
+            parameter("_start", (page - 1) * PAGE_SIZE)
+            parameter("_limit", PAGE_SIZE)
         }.body()
 
     suspend fun getPost(id: Int): Post = client.get("$baseURL/posts/$id").body()
