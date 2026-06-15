@@ -9,12 +9,14 @@ data class PostsUiState(
     val error: String? = null,
     val canLoadMore: Boolean = true,
     val currentPage: Int = 1,
+    val offlineMode: Boolean = false,
 )
 
 sealed class PostsIntent {
     object Refresh: PostsIntent()
     object LoadNextPage: PostsIntent()
     data class PostClicked(val post: Post): PostsIntent()
+    data class OfflineModeClicked(val newValue: Boolean): PostsIntent()
 }
 
 sealed class PostsEffect {

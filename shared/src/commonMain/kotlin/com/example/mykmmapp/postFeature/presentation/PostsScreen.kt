@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import com.example.mykmmapp.postFeature.data.model.Post
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -138,12 +140,36 @@ fun PostsContent(
             }
 
             else -> {
-                // List
-                PostList(
-                    dataState = state,
-                    listState = listState,
-                    onClick = onIntent,
-                )
+                Column {
+                    // DB button
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                        ,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Offline Mode (show only DB posts)",
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp)
+                            ,
+                        )
+
+                        Checkbox(
+                            checked = state.offlineMode,
+                            onCheckedChange = {
+                                onIntent(PostsIntent.OfflineModeClicked(it))
+                            },
+                        )
+                    }
+
+                    // List
+                    PostList(
+                        dataState = state,
+                        listState = listState,
+                        onClick = onIntent,
+                    )
+                }
 
                 // Error next page loading
                 if (state.error != null && state.posts.isNotEmpty()) {

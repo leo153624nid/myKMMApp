@@ -30,6 +30,7 @@ class PostsViewModel(
             is PostsIntent.Refresh -> refreshPosts()
             is PostsIntent.LoadNextPage -> loadNextPage()
             is PostsIntent.PostClicked -> navigateToDetail(intent.post.id)
+            is PostsIntent.OfflineModeClicked -> handleOfllineModeClicked(intent.newValue)
         }
     }
 
@@ -57,6 +58,7 @@ class PostsViewModel(
                             canLoadMore = posts.size >= repository.pageSize
                         )
                     }
+                    repository.cachePosts(posts)
                 }
                 .onFailure { error ->
                     val message = error.message ?: "Unknown error"
@@ -95,6 +97,7 @@ class PostsViewModel(
                             canLoadMore = newPosts.size >= repository.pageSize,
                         )
                     }
+                    repository.cachePosts(newPosts)
                 }
                 .onFailure { error ->
                     val message = error.message ?: "Unknown error"
@@ -112,6 +115,40 @@ class PostsViewModel(
     private fun navigateToDetail(postId: Int) {
         viewModelScope.launch {
             _effect.send(PostsEffect.NavigateToDetail(postId))
+        }
+    }
+
+    private fun handleOfllineModeClicked(newValue: Boolean) {
+        _state.update { it.copy(offlineMode = newValue) }
+        if (newValue) {
+            getCachedPosts()
+        } else {
+            refreshPosts()
+        }
+    }
+
+    private fun getCachedPosts() {
+        if (_state.value.isLoading) return
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    isLoading = true,
+                    error = null,
+                    posts = emptyList(),
+                    currentPage = 1,
+                    canLoadMore = false,
+                )
+            }
+
+            repository.getCachedPosts().collect { posts ->
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        posts = posts,
+                    )
+                }
+            }
         }
     }
 
