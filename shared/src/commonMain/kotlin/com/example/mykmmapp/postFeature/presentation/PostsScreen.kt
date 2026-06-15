@@ -3,6 +3,7 @@ package com.example.mykmmapp.postFeature.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,16 +36,26 @@ import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostsScreen(
     vm: PostsViewModel = koinViewModel(),
@@ -52,6 +63,7 @@ fun PostsScreen(
 ) {
     val state by vm.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(Unit) {
         vm.effect.collect { effect ->
@@ -84,6 +96,18 @@ fun PostsScreen(
                             contentDescription = "Back",
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = { vm.handleIntent(PostsIntent.OpenFilterSheet) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardReturn,
+                            contentDescription = null,
+                            tint = if (state.selectedUserId != null)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             )
         }
@@ -97,6 +121,20 @@ fun PostsScreen(
             PostsContent(
                 state,
                 onIntent = vm::handleIntent
+            )
+        }
+    }
+
+    // Bottom Sheet
+    if (state.isFilterSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { vm.handleIntent(PostsIntent.CloseFilterSheet) },
+            sheetState = sheetState,
+        ) {
+            FilterSheetContent(
+                selectedUserId = state.selectedUserId,
+                onApply = { userId -> vm.handleIntent(PostsIntent.ApllyFilter(userId)) },
+                onClear = { vm.handleIntent(PostsIntent.ApllyFilter(null)) },
             )
         }
     }
@@ -307,6 +345,80 @@ fun PostCell(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
             )
+        }
+    }
+}
+
+@Composable
+fun FilterSheetContent(
+    selectedUserId: Int?,
+    onApply: (Int?) -> Unit,
+    onClear: () -> Unit
+) {
+    // Локальный стейт шита — пока пользователь не нажал Apply
+    // не отправляем Intent в ViewModel
+    var localSelected by remember(selectedUserId) {
+        mutableStateOf(selectedUserId)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 32.dp),  // отступ от нижнего края
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Drag handle — полоска сверху (опционально, Material3 добавляет сам)
+        Text(
+            text = "Фильтры",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        HorizontalDivider()
+
+        Text(
+            text = "По пользователю",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        // Чипы с userId 1–5
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            (1..5).forEach { userId ->
+                FilterChip(
+                    selected = localSelected == userId,
+                    onClick = {
+                        localSelected = if (localSelected == userId) null else userId
+                    },
+                    label = { Text("User $userId") }
+                )
+            }
+        }
+
+        HorizontalDivider()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Сброс фильтра
+            OutlinedButton(
+                modifier = Modifier.weight(1f),
+                onClick = onClear,
+                enabled = selectedUserId != null
+            ) {
+                Text("Сбросить")
+            }
+
+            // Применить
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = { onApply(localSelected) }
+            ) {
+                Text("Применить")
+            }
         }
     }
 }

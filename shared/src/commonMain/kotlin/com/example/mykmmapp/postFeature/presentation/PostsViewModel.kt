@@ -31,6 +31,11 @@ class PostsViewModel(
             is PostsIntent.LoadNextPage -> loadNextPage()
             is PostsIntent.PostClicked -> navigateToDetail(intent.post.id)
             is PostsIntent.OfflineModeClicked -> handleOfllineModeClicked(intent.newValue)
+
+            // Bottom Sheet
+            is PostsIntent.OpenFilterSheet -> _state.update { it.copy(isFilterSheetVisible = true) }
+            is PostsIntent.CloseFilterSheet -> _state.update { it.copy(isFilterSheetVisible = false) }
+            is PostsIntent.ApllyFilter -> applyFilter(intent.userId)
         }
     }
 
@@ -149,6 +154,17 @@ class PostsViewModel(
                     )
                 }
             }
+        }
+    }
+
+    private fun applyFilter(userId: Int?) {
+        val newPosts = _state.value.posts.filter { it.userId == userId }
+        _state.update {
+            it.copy(
+                isFilterSheetVisible = false,
+                selectedUserId = userId,
+                posts = newPosts,
+            )
         }
     }
 

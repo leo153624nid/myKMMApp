@@ -10,6 +10,10 @@ data class PostsUiState(
     val canLoadMore: Boolean = true,
     val currentPage: Int = 1,
     val offlineMode: Boolean = false,
+
+    // Bottom Sheet
+    val isFilterSheetVisible: Boolean = false,
+    val selectedUserId: Int? = null,
 )
 
 sealed class PostsIntent {
@@ -17,6 +21,11 @@ sealed class PostsIntent {
     object LoadNextPage: PostsIntent()
     data class PostClicked(val post: Post): PostsIntent()
     data class OfflineModeClicked(val newValue: Boolean): PostsIntent()
+
+    // Bottom Sheet
+    object OpenFilterSheet: PostsIntent()
+    object CloseFilterSheet: PostsIntent()
+    data class ApllyFilter(val userId: Int?): PostsIntent()
 }
 
 sealed class PostsEffect {
