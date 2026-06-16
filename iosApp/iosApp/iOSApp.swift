@@ -6,9 +6,9 @@ struct iOSApp: App {
 
     init() {
         #if DEBUG
-            KoinInitializerKt.doInitKoin(isDebug: true)
+            KoinInitializerKt.doInitKoin(isDebug: true, extraModules: [])
         #else
-            KoinInitializerKt.doInitKoin(isDebug: false)
+            KoinInitializerKt.doInitKoin(isDebug: false, extraModules: [])
         #endif
     }
 
