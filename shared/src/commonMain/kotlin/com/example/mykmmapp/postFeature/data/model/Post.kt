@@ -31,7 +31,7 @@ fun PostEntity.toDomain() = Post(
     id = id.toInt(),
     userId = userId.toInt(),
     title = title,
-    body = body
+    body = desc
 )
 
 // Post → PostEntity
@@ -39,5 +39,5 @@ fun Post.toEntity() = PostEntity(
     id = id.toLong(),
     userId = userId.toLong(),
     title = title,
-    body = body
+    desc = body
 )

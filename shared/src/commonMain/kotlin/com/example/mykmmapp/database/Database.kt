@@ -21,7 +21,7 @@ class Database(driverFactory: DatabaseDriverFactory) {
             id = post.id.toLong(),
             userId = post.userId.toLong(),
             title = post.title,
-            body = post.body,
+            desc = post.desc,
         )
     }
 

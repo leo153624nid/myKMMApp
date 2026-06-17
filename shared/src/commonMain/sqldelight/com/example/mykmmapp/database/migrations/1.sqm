@@ -1,0 +1,13 @@
+ALTER TABLE PostEntity RENAME TO PostEntity_old;
+
+CREATE TABLE PostEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    desc TEXT NOT NULL
+);
+
+INSERT INTO PostEntity (id, userId, title, desc)
+SELECT id, userId, title, body FROM PostEntity_old;
+
+DROP TABLE PostEntity_old;
