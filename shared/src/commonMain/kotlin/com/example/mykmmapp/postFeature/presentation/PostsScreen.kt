@@ -118,10 +118,34 @@ fun PostsScreen(
                 .padding(paddingValues)
             ,
         ) {
-            PostsContent(
-                state,
-                onIntent = vm::handleIntent
-            )
+            Column {
+                // DB button
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                    ,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Offline Mode (show only DB posts)",
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                        ,
+                    )
+
+                    Checkbox(
+                        checked = state.offlineMode,
+                        onCheckedChange = {
+                            vm.handleIntent(PostsIntent.OfflineModeClicked(it))
+                        },
+                    )
+                }
+
+                PostsContent(
+                    state,
+                    onIntent = vm::handleIntent
+                )
+            }
         }
     }
 
@@ -178,36 +202,12 @@ fun PostsContent(
             }
 
             else -> {
-                Column {
-                    // DB button
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                        ,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "Offline Mode (show only DB posts)",
-                            modifier = Modifier
-                                .padding(horizontal = 20.dp)
-                            ,
-                        )
-
-                        Checkbox(
-                            checked = state.offlineMode,
-                            onCheckedChange = {
-                                onIntent(PostsIntent.OfflineModeClicked(it))
-                            },
-                        )
-                    }
-
-                    // List
-                    PostList(
-                        dataState = state,
-                        listState = listState,
-                        onClick = onIntent,
-                    )
-                }
+                // List
+                PostList(
+                    dataState = state,
+                    listState = listState,
+                    onClick = onIntent,
+                )
 
                 // Error next page loading
                 if (state.error != null && state.posts.isNotEmpty()) {
