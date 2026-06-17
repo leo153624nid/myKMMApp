@@ -41,6 +41,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqldelight.android.driver)
+            implementation("androidx.security:security-crypto:1.1.0-alpha06")
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -62,6 +63,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.auth)
             implementation(libs.ktor.client.logging)
 
             implementation(libs.koin.core)

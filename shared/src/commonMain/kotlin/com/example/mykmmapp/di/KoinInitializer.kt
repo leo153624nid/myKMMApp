@@ -14,10 +14,15 @@ fun initKoin(
         single<Platform> { getPlatform(isDebug) }
     }
     val databaseModule = databaseModule()
+    val tokenStorageModule = tokenStorageModule()
 
     startKoin {
         modules(
-            extraModules + platformModule + databaseModule + appModules
+            extraModules +
+            platformModule +
+            databaseModule +
+            tokenStorageModule +
+            appModules
         )
     }
 }
