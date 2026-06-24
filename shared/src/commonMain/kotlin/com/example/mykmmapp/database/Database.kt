@@ -25,6 +25,19 @@ class Database(driverFactory: DatabaseDriverFactory) {
         )
     }
 
+    fun insertPosts(posts: List<PostEntity>) {
+        queries.transaction {
+            posts.forEach {
+                queries.insert(
+                    id = it.id.toLong(),
+                    userId = it.userId.toLong(),
+                    title = it.title,
+                    desc = it.desc,
+                )
+            }
+        }
+    }
+
     fun deleteAllPosts() {
         queries.deleteAll()
     }
