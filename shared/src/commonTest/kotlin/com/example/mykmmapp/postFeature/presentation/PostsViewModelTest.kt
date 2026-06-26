@@ -16,6 +16,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -197,6 +198,24 @@ class PostsViewModelTest {
             assertEquals(mockRepository.getPostsCallCount,3)
             assertEquals(mockRepository.cachePostsCallCount, 2)
             assertEquals(expected, loaded.error)
+        }
+    }
+
+    @Test
+    fun `postClicked`() = runTest {
+        val post = Post(
+            id = 11,
+            userId = 222,
+            title = "title",
+            body = "body"
+        )
+
+        sut.effect.test {
+            sut.handleIntent(PostsIntent.PostClicked(post))
+
+            val effect = awaitItem()
+            assertIs<PostsEffect.NavigateToDetail>(effect)
+            assertEquals(11, effect.postId)
         }
     }
 
