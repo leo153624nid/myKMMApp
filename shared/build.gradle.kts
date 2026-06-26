@@ -72,6 +72,10 @@ kotlin {
 
             implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.coroutines)
+
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

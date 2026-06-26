@@ -18,8 +18,12 @@ kotlinx-serialization = "1.9.0"
 ktor = "3.2.3"
 koin = "4.1.0"
 sqldelight = "2.0.2"
+kotlinx-coroutines = "1.9.0"
+turbine = "1.2.0"
 
 [libraries]
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
