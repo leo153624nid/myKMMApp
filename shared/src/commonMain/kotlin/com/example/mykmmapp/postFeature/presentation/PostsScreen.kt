@@ -156,8 +156,8 @@ fun PostsScreen(
         ) {
             FilterSheetContent(
                 selectedUserId = state.selectedUserId,
-                onApply = { userId -> vm.handleIntent(PostsIntent.ApllyFilter(userId)) },
-                onClear = { vm.handleIntent(PostsIntent.ApllyFilter(null)) },
+                onApply = { userId -> vm.handleIntent(PostsIntent.ApplyFilter(userId)) },
+                onClear = { vm.handleIntent(PostsIntent.ApplyFilter(null)) },
             )
         }
     }

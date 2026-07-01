@@ -5,6 +5,7 @@ import com.example.mykmmapp.postFeature.data.model.Post
 import com.example.mykmmapp.postFeature.data.model.toDomain
 import com.example.mykmmapp.postFeature.data.model.toEntity
 import com.example.mykmmapp.postFeature.data.network.PostApi
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +39,7 @@ class PostRepositoryImpl(
             withContext(Dispatchers.Default) {
                 posts.map { it.toDomain() }
             }
-        }
+        }.onFailure { if (it is CancellationException) throw it }
     }
 
     override suspend fun getPost(id: Int): Result<Post> {
@@ -47,7 +48,7 @@ class PostRepositoryImpl(
             withContext(Dispatchers.Default) {
                 post.toDomain()
             }
-        }
+        }.onFailure { if (it is CancellationException) throw it }
     }
 
     // MARK: - Database

@@ -25,7 +25,7 @@ sealed class PostsIntent {
     // Bottom Sheet
     object OpenFilterSheet: PostsIntent()
     object CloseFilterSheet: PostsIntent()
-    data class ApllyFilter(val userId: Int?): PostsIntent()
+    data class ApplyFilter(val userId: Int?): PostsIntent()
 }
 
 sealed class PostsEffect {

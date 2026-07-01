@@ -2,8 +2,9 @@ package com.example.mykmmapp.postFeature.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mykmmapp.postFeature.data.network.PostApi
+import com.example.mykmmapp.postFeature.data.model.Post
 import com.example.mykmmapp.postFeature.data.repository.PostRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,9 @@ class PostsViewModel(
     private val _effect = Channel<PostsEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
+    private var unfilteredPosts: List<Post> = emptyList()
+    private var cachedPostsJob: Job? = null
+
     init {
         handleIntent(PostsIntent.Refresh)
     }
@@ -30,19 +34,22 @@ class PostsViewModel(
             is PostsIntent.Refresh -> refreshPosts()
             is PostsIntent.LoadNextPage -> loadNextPage()
             is PostsIntent.PostClicked -> navigateToDetail(intent.post.id)
-            is PostsIntent.OfflineModeClicked -> handleOfllineModeClicked(intent.newValue)
+            is PostsIntent.OfflineModeClicked -> handleOfflineModeClicked(intent.newValue)
 
             // Bottom Sheet
             is PostsIntent.OpenFilterSheet -> _state.update { it.copy(isFilterSheetVisible = true) }
             is PostsIntent.CloseFilterSheet -> _state.update { it.copy(isFilterSheetVisible = false) }
-            is PostsIntent.ApllyFilter -> applyFilter(intent.userId)
+            is PostsIntent.ApplyFilter -> applyFilter(intent.userId)
         }
     }
 
     private fun refreshPosts() {
         if (_state.value.isLoading) return
 
+        cachedPostsJob?.cancel()
+
         viewModelScope.launch {
+            unfilteredPosts = emptyList()
             _state.update {
                 it.copy(
                     isLoading = true,
@@ -55,6 +62,7 @@ class PostsViewModel(
 
             repository.getPosts(page = 1)
                 .onSuccess { posts ->
+                    unfilteredPosts = posts
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -78,7 +86,7 @@ class PostsViewModel(
         }
     }
 
-    fun loadNextPage() {
+    private fun loadNextPage() {
         val current = _state.value
 
         if (current.isLoading) return
@@ -94,10 +102,15 @@ class PostsViewModel(
 
             repository.getPosts(page = nextPage)
                 .onSuccess { newPosts ->
+                    unfilteredPosts = unfilteredPosts + newPosts
+                    val displayedPosts = current.selectedUserId?.let { userId ->
+                        unfilteredPosts.filter { it.userId == userId }
+                    } ?: unfilteredPosts
+
                     _state.update {
                         it.copy(
                             isLoadingMore = false,
-                            posts = it.posts + newPosts,
+                            posts = displayedPosts,
                             currentPage = nextPage,
                             canLoadMore = newPosts.size >= repository.pageSize,
                         )
@@ -123,7 +136,7 @@ class PostsViewModel(
         }
     }
 
-    private fun handleOfllineModeClicked(newValue: Boolean) {
+    private fun handleOfflineModeClicked(newValue: Boolean) {
         _state.update { it.copy(offlineMode = newValue) }
         if (newValue) {
             getCachedPosts()
@@ -135,7 +148,8 @@ class PostsViewModel(
     private fun getCachedPosts() {
         if (_state.value.isLoading) return
 
-        viewModelScope.launch {
+        cachedPostsJob?.cancel()
+        cachedPostsJob = viewModelScope.launch {
             _state.update {
                 it.copy(
                     isLoading = true,
@@ -147,6 +161,7 @@ class PostsViewModel(
             }
 
             repository.getCachedPosts().collect { posts ->
+                unfilteredPosts = posts
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -158,12 +173,17 @@ class PostsViewModel(
     }
 
     private fun applyFilter(userId: Int?) {
-        val newPosts = _state.value.posts.filter { it.userId == userId }
+        val filtered = if (userId == null) {
+            unfilteredPosts
+        } else {
+            unfilteredPosts.filter { it.userId == userId }
+        }
+
         _state.update {
             it.copy(
                 isFilterSheetVisible = false,
                 selectedUserId = userId,
-                posts = newPosts,
+                posts = filtered,
             )
         }
     }
